@@ -112,6 +112,9 @@ function invalidAssets (account, option, badTransactions) {
 			case 'delegate':
 				transaction = node.lisk.delegate.createDelegate(account.password, node.randomDelegateName());
 				break;
+			case 'votes':
+				transaction = node.lisk.vote.createVote(account.password, []);
+				break;
 		}
 	});
 
@@ -136,7 +139,7 @@ function invalidAssets (account, option, badTransactions) {
 		tests.forEach(function (test) {
 			it('using ' + test.describe + ' should fail', function (done) {
 				transaction.asset[option] = test.args;
-
+				
 				sendTransaction(transaction, function (err, res) {
 					node.expect(res).to.have.property('success').to.be.not.ok;
 					node.expect(res).to.have.property('message');
@@ -147,7 +150,7 @@ function invalidAssets (account, option, badTransactions) {
 		});
 	});
 
-	describe('using invalid asset.' + option + ' property values', function () {
+	describe('using invalid asset.' + option + '[0] values', function () {
 
 		tests.forEach(function (test) {
 			it('using ' + test.describe + ' should fail', function (done) {
