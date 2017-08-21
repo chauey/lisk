@@ -222,6 +222,54 @@ describe('POST /api/transactions (type 1)', function () {
 				}, true);
 			});
 		});
+
+		describe('type 3 - voting delegate', function () {
+
+			it('using no second passphrase should fail', function (done) {
+				transaction = node.lisk.vote.createVote(account.password, ['+' + node.eAccount.publicKey]);
+
+				sendTransaction(transaction, function (err, res) {
+					node.expect(res).to.have.property('success').to.be.not.ok;
+					node.expect(res).to.have.property('message').to.equal('Missing sender second signature');
+					badTransactionsEnforcement.push(transaction);
+					done();
+				}, true);
+			});
+
+			it('using invalid second passphrase should fail', function (done) {
+				transaction = node.lisk.vote.createVote(account.password, ['+' + node.eAccount.publicKey], 'invalid password');
+
+				sendTransaction(transaction, function (err, res) {
+					node.expect(res).to.have.property('success').to.be.not.ok;
+					node.expect(res).to.have.property('message').to.equal('Failed to verify second signature');
+					badTransactionsEnforcement.push(transaction);
+					done();
+				}, true);
+			});
+
+			it('using correct second passphrase should be ok', function (done) {
+				transaction = node.lisk.vote.createVote(account.password, ['+' + node.eAccount.publicKey], account.secondPassword);
+
+				sendTransaction(transaction, function (err, res) {
+					node.expect(res).to.have.property('success').to.be.ok;
+					node.expect(res).to.have.property('transactionId').to.equal(transaction.id);
+					goodTransactionsEnforcement.push(transaction);
+					done();
+				}, true);
+			});
+
+			// TODO: waiting to fix lisk-js #285
+			it.skip('using correct empty second passphrase should be ok', function (done) {
+				transaction = node.lisk.vote.createVote(accountEmptySecondPassword.password, ['+' + node.eAccount.publicKey], accountEmptySecondPassword.secondPassword);
+
+				sendTransaction(transaction, function (err, res) {
+					node.expect(res).to.have.property('success').to.be.ok;
+					node.expect(res).to.have.property('transactionId').to.equal(transaction.id);
+					goodTransactionsEnforcement.push(transaction);
+					done();
+				}, true);
+			});
+		});
 	});
 
 	describe('enforcement confirmation', function () {

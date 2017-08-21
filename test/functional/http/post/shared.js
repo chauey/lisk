@@ -30,7 +30,7 @@ var tests = [
 	{describe: '0 as string',				args: '0'},
 	{describe: 'regular string',		args: String('abc')},
 	{describe: 'uppercase string',	args: String('ABC')},
-	{describe: 'invalid chars',			args: String('/@')},
+	{describe: 'invalid chars',			args: String('/')},
 	{describe: 'date',							args: new Date()},
 	{describe: 'true boolean',			args: true},
 	{describe: 'false boolean',			args: false},
@@ -139,22 +139,6 @@ function invalidAssets (account, option, badTransactions) {
 		tests.forEach(function (test) {
 			it('using ' + test.describe + ' should fail', function (done) {
 				transaction.asset[option] = test.args;
-				
-				sendTransaction(transaction, function (err, res) {
-					node.expect(res).to.have.property('success').to.be.not.ok;
-					node.expect(res).to.have.property('message');
-					badTransactions.push(transaction);
-					done();
-				}, true);
-			});
-		});
-	});
-
-	describe('using invalid asset.' + option + '[0] values', function () {
-
-		tests.forEach(function (test) {
-			it('using ' + test.describe + ' should fail', function (done) {
-				transaction.asset[option][Object.keys(transaction.asset[option])[0]] = test.args;
 
 				sendTransaction(transaction, function (err, res) {
 					node.expect(res).to.have.property('success').to.be.not.ok;
