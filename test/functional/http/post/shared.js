@@ -93,7 +93,7 @@ function invalidTxs () {
 		it('using ' + test.describe + ' should fail', function (done) {
 			sendTransaction(test.args, function (err, res) {
 				node.expect(res).to.have.property('success').to.not.be.ok;
-				node.expect(res).to.have.property('message');
+				node.expect(res).to.have.property('message').that.is.not.empty;
 				done();
 			}, true);
 		});
@@ -126,7 +126,7 @@ function invalidAssets (account, option, badTransactions) {
 
 				sendTransaction(transaction, function (err, res) {
 					node.expect(res).to.have.property('success').to.be.not.ok;
-					node.expect(res).to.have.property('message');
+					node.expect(res).to.have.property('message').that.is.not.empty;
 					badTransactions.push(transaction);
 					done();
 				}, true);
@@ -142,7 +142,7 @@ function invalidAssets (account, option, badTransactions) {
 
 				sendTransaction(transaction, function (err, res) {
 					node.expect(res).to.have.property('success').to.be.not.ok;
-					node.expect(res).to.have.property('message');
+					node.expect(res).to.have.property('message').that.is.not.empty;
 					badTransactions.push(transaction);
 					done();
 				}, true);

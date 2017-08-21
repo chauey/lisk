@@ -5,7 +5,7 @@ var shared = require('./shared');
 var constants = require('../../../../helpers/constants');
 
 var sendTransaction = require('../../../common/complexTransactions').sendTransaction;
-var sendLISK = require('../../../common/complexTransactions').sendLISK;
+var creditAccount = require('../../../common/complexTransactions').creditAccount;
 
 function registerDelegate (account, done) {
 	var transaction = node.lisk.delegate.createDelegate(account.password, account.username);
@@ -28,11 +28,9 @@ describe('POST /api/transactions (type 3)', function () {
 	var accountNoFunds = node.randomAccount();
 	var accountScarceFunds = node.randomAccount();
 
-	var accounts33;
 	var account33 = node.randomAccount();
 	var delegates33 = [];
 
-	var accounts101;
 	var account101 = node.randomAccount();
 	var delegates101 = [];
 
@@ -40,61 +38,37 @@ describe('POST /api/transactions (type 3)', function () {
 
 	before(function (done) {
 		// Crediting accounts
-		sendLISK({
-			secret: node.gAccount.password,
-			amount: 100000000000,
-			address: account.address
-		}, function (err, res) {
+		creditAccount(account.address, 100000000000, function (err, res) {
 			node.expect(res).to.have.property('success').to.be.ok;
 			node.expect(res).to.have.property('transactionId').that.is.not.empty;
 		});
 
-		sendLISK({
-			secret: node.gAccount.password,
-			amount: constants.fees.vote,
-			address: accountScarceFunds.address
-		}, function (err, res) {
+		creditAccount(accountScarceFunds.address, constants.fees.vote, function (err, res) {
 			node.expect(res).to.have.property('success').to.be.ok;
 			node.expect(res).to.have.property('transactionId').that.is.not.empty;
 		});
 
-		sendLISK({
-			secret: node.gAccount.password,
-			amount: 100000000000,
-			address: node.eAccount.address
-		}, function (err, res) {
+		creditAccount(node.eAccount.address, 100000000000, function (err, res) {
 			node.expect(res).to.have.property('success').to.be.ok;
 			node.expect(res).to.have.property('transactionId').that.is.not.empty;
 		});
 
-		sendLISK({
-			secret: node.gAccount.password,
-			amount: 100000000000,
-			address: account33.address
-		}, function (err, res) {
+		creditAccount(account33.address, 100000000000, function (err, res) {
 			node.expect(res).to.have.property('success').to.be.ok;
 			node.expect(res).to.have.property('transactionId').that.is.not.empty;
 		});
 
-		sendLISK({
-			secret: node.gAccount.password,
-			amount: 300000000000,
-			address: account101.address
-		}, function (err, res) {
+		creditAccount(account101.address, 300000000000, function (err, res) {
 			node.expect(res).to.have.property('success').to.be.ok;
 			node.expect(res).to.have.property('transactionId').that.is.not.empty;
 		});
 
 		// Creating 33 delegates
 		node.async.times(33, function (n, eachCb) {
-			accounts33 = node.randomAccount();
+			var accounts33 = node.randomAccount();
 			accounts33.username = 'delegate33@' + n;
 			delegates33.push(accounts33);
-			sendLISK({
-				secret: node.gAccount.password,
-				amount: constants.fees.delegate,
-				address: accounts33.address
-			}, function (err, res) {
+			creditAccount(accounts33.address, constants.fees.delegate, function (err, res) {
 				node.expect(res).to.have.property('success').to.be.ok;
 				node.expect(res).to.have.property('transactionId').that.is.not.empty;
 				return eachCb();
@@ -106,20 +80,15 @@ describe('POST /api/transactions (type 3)', function () {
 						return eachCb();
 					});
 				});
-				node.waitForBlocks(6, done);
 			});
 		});
 
 		// Creating 101 delegates
 		node.async.times(101, function (n, eachCb) {
-			accounts101 = node.randomAccount();
+			var accounts101 = node.randomAccount();
 			accounts101.username = 'delegate101@' + n;
 			delegates101.push(accounts101);
-			sendLISK({
-				secret: node.gAccount.password,
-				amount: constants.fees.delegate,
-				address: accounts101.address
-			}, function (err, res) {
+			creditAccount(accounts101.address, constants.fees.delegate, function (err, res) {
 				node.expect(res).to.have.property('success').to.be.ok;
 				node.expect(res).to.have.property('transactionId').that.is.not.empty;
 				return eachCb();
@@ -131,6 +100,7 @@ describe('POST /api/transactions (type 3)', function () {
 						return eachCb();
 					});
 				});
+				node.waitForBlocks(6, done);
 			});
 		});
 	});

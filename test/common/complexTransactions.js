@@ -29,7 +29,13 @@ function sendSignature (signature, transaction, cb) {
 }
 
 function sendLISK (params, cb) {
+	console.log(params);
 	var transaction = lisk.transaction.createTransaction(params.address, params.amount, params.secret, params.secondSecret);
+	sendTransaction(transaction, cb);
+}
+
+function creditAccount (address, amount, cb) {
+	var transaction = lisk.transaction.createTransaction(address, amount, node.gAccount.password);
 	sendTransaction(transaction, cb);
 }
 
@@ -38,5 +44,6 @@ module.exports = {
 	getUnconfirmedTransaction: getUnconfirmedTransaction,
 	sendSignature: sendSignature,
 	sendTransaction: sendTransaction,
-	sendLISK: sendLISK
+	sendLISK: sendLISK,
+	creditAccount: creditAccount
 };
